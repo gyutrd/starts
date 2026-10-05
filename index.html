@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Сезон стартов 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Montserrat:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: race-bib header, sticky filter rail on the left, season strip + month grid / list on the right; one column on phones */
+:root{
+  --bg:#f6f2fb; --surface:#ffffff; --surface-2:#faf7fd; --line:#e6ddf1; --fg:#24162f; --muted:#6e5f80;
+  --accent:#6b2fc4; --accent-fg:#ffffff; --pink:#e5528f;
+  --tri:#119e91; --run:#e5528f; --swim:#9a7be0; --swr:#6b2fc4;
+  --warn:#a8670f; --warn-bg:#fdf1df; --bad:#c42f6a; --bad-bg:#fce6ef;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Montserrat",system-ui,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#140e1c; --surface:#1d1528; --surface-2:#241b31; --line:#352a45; --fg:#f0e9f7; --muted:#a898ba;
+  --accent:#a77bff; --accent-fg:#160b24; --pink:#ff7aae;
+  --tri:#3fd6c6; --run:#ff7aae; --swim:#c3a8ff; --swr:#9c6bff;
+  --warn:#f0b450; --warn-bg:#33260f; --bad:#ff7aa6; --bad-bg:#3a1424; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#140e1c; --surface:#1d1528; --surface-2:#241b31; --line:#352a45; --fg:#f0e9f7; --muted:#a898ba;
+  --accent:#a77bff; --accent-fg:#160b24; --pink:#ff7aae;
+  --tri:#3fd6c6; --run:#ff7aae; --swim:#c3a8ff; --swr:#9c6bff;
+  --warn:#f0b450; --warn-bg:#33260f; --bad:#ff7aa6; --bad-bg:#3a1424; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:18px}
+.bib{display:flex;align-items:stretch;gap:0;border:2px solid var(--accent);border-radius:8px;overflow:hidden;background:var(--surface)}
+.bib .no{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;padding:10px 14px;background:linear-gradient(135deg,var(--pink),var(--accent));color:var(--accent-fg);display:flex;align-items:center;letter-spacing:.01em}
+.bib .tt{padding:8px 14px;display:flex;flex-direction:column;justify-content:center}
+.bib h1{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.1;margin:0;letter-spacing:-.01em}
+.bib .sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.stats{display:flex;gap:18px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--f-display);font-weight:700;font-size:22px;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+
+/* layout */
+.grid{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 24px);overflow:auto}
+@media (max-width:900px){.rail{position:static;max-height:none}}
+.rail details summary{display:none}
+@media (max-width:900px){
+  .rail details summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;list-style:none}
+  .rail details summary::-webkit-details-marker{display:none}
+  .rail details[open] summary{margin-bottom:12px}
+}
+.fgroup{display:flex;flex-direction:column;gap:7px}
+.fgroup + .fgroup{margin-top:14px}
+.flabel{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 10px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;line-height:1.3}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c,var(--muted))}
+.search,.sel{width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:7px 10px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+.reset{align-self:flex-start;background:none;border:none;padding:0;color:var(--accent);font-weight:600;cursor:pointer;font-size:13px}
+.hint{font-size:12px;color:var(--muted)}
+
+/* main */
+.main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.h2{font-family:var(--f-display);font-weight:700;font-size:16px;letter-spacing:-.005em;margin:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* season strip */
+.stripbox{overflow-x:auto;margin-top:10px;padding-bottom:4px}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:18px;gap:3px;align-items:end;min-width:max-content}
+.wk{display:flex;flex-direction:column-reverse;gap:2px;height:96px;cursor:pointer;border-radius:4px;padding:2px 1px;background:transparent;border:none}
+.wk:hover{background:var(--surface-2)}
+.wk.cur{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.tick{height:6px;border-radius:2px;background:var(--c)}
+.tick.est{background:transparent;border:1.5px dashed var(--c);height:6px}
+.wk .more{font-size:9px;color:var(--muted);text-align:center;font-family:var(--f-mono)}
+.mlabels{display:grid;grid-auto-flow:column;grid-auto-columns:18px;gap:3px;min-width:max-content;margin-top:4px}
+.mlabels span{font-size:10.5px;color:var(--muted);font-family:var(--f-mono);white-space:nowrap;text-transform:uppercase}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg-est{width:14px;height:6px;border:1.5px dashed var(--muted);border-radius:2px}
+
+/* tabs */
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.tabs button{border:none;background:none;padding:7px 14px;cursor:pointer;font-weight:600;font-size:13px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-fg)}
+
+/* calendar */
+.calnav{display:flex;align-items:center;gap:8px}
+.calnav button{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px}
+.calnav button:disabled{opacity:.35;cursor:default}
+.mname{font-family:var(--f-display);font-weight:700;font-size:17px;min-width:190px;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:12px}
+.dow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center;padding-bottom:2px}
+.day{min-height:104px;background:var(--surface-2);border:1px solid transparent;border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;min-width:0;cursor:pointer;text-align:left}
+.day.out{opacity:.35;cursor:default}
+.day.we{background:color-mix(in srgb,var(--surface-2) 70%,var(--line))}
+.day.sel{border-color:var(--accent)}
+.day.busy .dn::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pink);margin-left:5px;vertical-align:middle}
+.dn{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ev{display:block;font-size:11.5px;line-height:1.25;padding:2px 5px;border-radius:4px;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 15%,var(--surface));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-top:none;border-right:none;border-bottom:none;width:100%;text-align:left}
+.ev.est{background:transparent;border-left-style:dashed;outline:1px dashed color-mix(in srgb,var(--c) 55%,transparent);outline-offset:-1px}
+.ev.star::before{content:"★ ";color:var(--pink)}
+.ev.cont{opacity:.7}
+.evmore{font-size:11px;color:var(--muted);padding-left:4px}
+@media (max-width:640px){
+  .day{min-height:58px;padding:4px}
+  .ev{font-size:0;height:5px;padding:0;border-left-width:0;border-radius:3px;background:var(--c)}
+  .ev.est{background:transparent;outline:1.5px dashed var(--c)}
+  .ev.star::before{content:none}
+  .evmore{display:none}
+}
+.daypanel{margin-top:12px}
+.daypanel h3{margin:0 0 8px;font-size:14px}
+
+/* list */
+.mhead{font-family:var(--f-display);font-weight:700;font-size:14px;margin:18px 0 6px;color:var(--accent)}
+.mhead:first-child{margin-top:0}
+.item{display:grid;grid-template-columns:92px 4px minmax(0,1fr) auto;gap:12px;align-items:start;padding:10px 4px;border-top:1px solid var(--line)}
+.item .dt{font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums;line-height:1.35}
+.item .dt small{display:block;color:var(--muted);font-size:11px}
+.item .bar{width:4px;align-self:stretch;border-radius:2px;background:var(--c)}
+.item.est .bar{background:repeating-linear-gradient(var(--c) 0 5px,transparent 5px 9px)}
+.item .nm{font-weight:600;cursor:pointer;background:none;border:none;padding:0;text-align:left}
+.item .nm:hover{text-decoration:underline}
+.item .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.item .dist{font-size:12.5px;margin-top:3px}
+.badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.b{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.b.estb{border-style:dashed;color:var(--warn);border-color:var(--warn)}
+.b.clash{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.starbtn{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;color:var(--muted);flex:none}
+.starbtn[aria-pressed="true"]{color:var(--pink);border-color:var(--pink)}
+@media (max-width:520px){.item{grid-template-columns:70px 4px minmax(0,1fr) auto;gap:9px}}
+.empty{padding:28px 8px;text-align:center;color:var(--muted)}
+
+/* plan */
+.plan ol{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+.plan li{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.plan .gap{grid-column:1/-1;font-size:12px;padding:3px 10px;border-radius:6px;justify-self:start}
+.gap.bad{background:var(--bad-bg);color:var(--bad)}
+.gap.warn{background:var(--warn-bg);color:var(--warn)}
+.gap.ok{color:var(--muted);padding-left:0}
+.plan .x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+
+/* modal */
+.ovl{position:fixed;inset:0;background:rgba(10,15,20,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal{background:var(--surface);border-radius:14px;max-width:520px;width:100%;padding:18px;border-top:6px solid var(--c);max-height:90vh;overflow:auto}
+.modal h3{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.2;margin:0 0 6px}
+.modal dl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;margin:14px 0}
+.modal dt{color:var(--muted);font-size:12.5px}
+.modal dd{margin:0}
+.modal .acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.pri{background:linear-gradient(135deg,var(--pink),var(--accent));color:var(--accent-fg);border-color:var(--accent)}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:12.5px}
+
+.foot{font-size:12.5px;color:var(--muted);max-width:75ch}
+.foot p{margin:0 0 8px}
+@media (prefers-reduced-motion:no-preference){.wk,.chip,.ev{transition:background .12s,border-color .12s}}
+</style>
+<style>body{margin:0;-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="bib">
+      <div class="no" aria-hidden="true">GO!</div>
+      <div class="tt">
+        <h1>Сезон стартов</h1>
+        <div class="sub">Ноябрь 2026 — декабрь 2027 · данные на <span id="upd">5 октября 2026</span> · обновляется по понедельникам</div>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="grid">
+    <aside class="rail">
+      <details id="fdet" open>
+        <summary><span>Фильтры</span><span id="fcount" class="hint"></span></summary>
+        <div>
+          <div class="fgroup">
+            <label class="flabel" for="q">Поиск</label>
+            <input class="search" id="q" type="search" placeholder="Город, старт, серия…">
+          </div>
+          <div class="fgroup"><span class="flabel">Вид спорта</span><div class="chips" id="f-sport"></div></div>
+          <div class="fgroup"><span class="flabel">Дистанция</span><div class="chips" id="f-dist"></div><span class="hint">У X-WATERS и части азиатских стартов дистанции смотрите на сайте, при выборе дистанции они скрываются.</span></div>
+          <div class="fgroup"><span class="flabel">Регион</span><div class="chips" id="f-region"></div></div>
+          <div class="fgroup">
+            <label class="flabel" for="f-country">Страна</label>
+            <select class="sel" id="f-country"></select>
+          </div>
+          <div class="fgroup"><span class="flabel">Серия / организатор</span><div class="chips" id="f-series"></div></div>
+          <div class="fgroup">
+            <label class="toggle"><input type="checkbox" id="f-conf"> Только подтверждённые даты</label>
+            <label class="toggle"><input type="checkbox" id="f-star"> Только мои ★</label>
+          </div>
+          <div class="fgroup"><button class="reset" id="reset" type="button">Сбросить фильтры</button></div>
+        </div>
+      </details>
+    </aside>
+
+    <main class="main">
+      <section class="card">
+        <div class="row">
+          <h2 class="h2">Сезон по неделям</h2>
+          <div class="legend">
+            <span><i class="dot" style="--c:var(--tri)"></i>Триатлон</span>
+            <span><i class="dot" style="--c:var(--run)"></i>Бег</span>
+            <span><i class="dot" style="--c:var(--swim)"></i>Плавание</span>
+            <span><i class="dot" style="--c:var(--swr)"></i>Свимран</span>
+            <span><i class="lg-est"></i>Дата ориентировочная</span>
+          </div>
+        </div>
+        <div class="stripbox" id="stripbox"><div class="strip" id="strip"></div><div class="mlabels" id="mlabels"></div></div>
+        <div class="hint">Каждая отметка — старт. Нажмите на неделю, чтобы открыть этот месяц в календаре.</div>
+      </section>
+
+      <section class="card plan" id="plan"></section>
+
+      <section class="card">
+        <div class="row">
+          <div class="tabs" role="tablist">
+            <button role="tab" id="tab-cal" aria-selected="true" type="button">Календарь</button>
+            <button role="tab" id="tab-list" aria-selected="false" type="button">Список</button>
+          </div>
+          <div class="calnav" id="calnav">
+            <button id="prev" type="button" aria-label="Предыдущий месяц">‹</button>
+            <div class="mname" id="mname"></div>
+            <button id="next" type="button" aria-label="Следующий месяц">›</button>
+          </div>
+        </div>
+        <div id="view-cal">
+          <div class="cal" id="cal"></div>
+          <div class="daypanel" id="daypanel" hidden></div>
+        </div>
+        <div id="view-list" hidden></div>
+      </section>
+
+      <section class="foot">
+        <p><b>Откуда данные.</b> Календари IRONSTAR, X-WATERS, Бегового сообщества, «Бегом по Золотому кольцу», KAVKAZ.RUN, ПроСпорт40, SwimSupRun, T100 / Triathlon World Tour и Challenge Family; азиатские триатлоны IRONMAN, Laguna Phuket и TriFactor; крупные марафоны Японии, Китая, Кореи, Гонконга, Беларуси, Узбекистана, Киргизии, Армении и Грузии; старты Архангельской области.</p>
+        <p><b>Russia Running</b> — это площадка регистрации с тысячами событий, и её сайт закрыт для автоматического сбора. Здесь — крупные старты, которые там регистрируются: Казанский, Пермский, Сочи и Челябинский марафоны, ЗаБег.РФ, «Энергия Русского Севера».</p>
+        <p><b>Пунктир</b> — дата ещё не объявлена, и я поставила её по прошлогоднему расписанию. Беговое сообщество пока не опубликовало календарь 2027, азиатские IRONMAN тоже. Перед планированием поездки проверьте дату на сайте организатора.</p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="ovl" id="ovl" hidden></div>
+
+<script>
+(function(){
+const SPORTS={tri:{n:'Триатлон',c:'var(--tri)'},run:{n:'Бег',c:'var(--run)'},swim:{n:'Плавание',c:'var(--swim)'},swimrun:{n:'Свимран',c:'var(--swr)'}};
+const DIST={tri_s:['tri','Три: спринт / ⅛'],tri_o:['tri','Три: олимпийка / ¼'],tri_h:['tri','Три: 113 / T100'],tri_f:['tri','Три: 226'],run_s:['run','Бег: до 10 км'],run_h:['run','Бег: 21,1 км'],run_m:['run','Бег: 42,2 км'],sw_s:['swim','Плав: до 2 км'],sw_m:['swim','Плав: 2–5 км'],swr:['swimrun','Свимран']};
+const REG={ru:'Россия',cis:'Ближнее зарубежье',asia:'Азия',world:'Другие страны'};
+const CIS=new Set(['Беларусь','Армения','Грузия','Узбекистан','Киргизия','Казахстан']);
+const ID_STAR='starts27-stars';
+
+const EV=[];let n=0;
+function E(sport,name,short,series,start,end,city,country,region,tags,dist,url,status,note){EV.push({id:'e'+(n++),sport,name,short,series,start,end:end||start,city,country,region,tags:tags||[],dist,url,status:status||'ok',note:note||''});}
+const IS='https://iron-star.com/event/', XW='https://x-waters.com/events/', CF='https://challengefamily.com/races/', T1='https://t100triathlon.com/', TW='https://t100triathlon.com/triathlon-world-tour';
+const XWD='Дистанции и форматы — на странице заплыва';
+const EST='Дата не объявлена, поставлена по расписанию прошлого года';
+
+/* ---------- IRONSTAR ---------- */
+E('tri','IRONSTAR Египет: 113 и Олимпийка','IRONSTAR 113 Египет','IRONSTAR','2027-02-06',0,'Шарм-эль-Шейх','Египет','world',['tri_h','tri_o'],'113: 1,93 / 90 / 21,1 км · Олимпийка: 1,5 / 40 / 10 км',IS+'ironstar-113-egypt-2027');
+E('swim','SWIMSTAR 1 миля, Египет','SWIMSTAR Египет','IRONSTAR','2027-02-05',0,'Шарм-эль-Шейх','Египет','world',['sw_s'],'1,85 км, открытая вода',IS+'swimstar-one-mile-egypt-2027','ok','Осталось мало слотов');
+E('run','IRONLADY / MANSTAR, Египет','5 км Египет','IRONSTAR','2027-02-05',0,'Шарм-эль-Шейх','Египет','world',['run_s'],'5 км (женский и мужской забеги)',IS+'ironlady-egypt-2027');
+E('tri','IRONSTAR Воронеж: ¼, Супермикс, ⅛','IRONSTAR Воронеж','IRONSTAR','2027-06-06',0,'Воронеж','Россия','ru',['tri_s','tri_o'],'¼: 1 / 45 / 10 км · Супермикс: 1,5 / 67 / 15 км · ⅛: 0,5 / 22 / 5 км',IS+'ironstar-1-4-voronezh-2027');
+E('swim','SWIMSTAR Воронеж','SWIMSTAR Воронеж','IRONSTAR','2027-06-05',0,'Воронеж','Россия','ru',['sw_s'],'1 км, 1 миля (1,85 км), эстафета 2 × 1 км',IS+'swimstar-1-milya-voronezh-2027');
+E('swimrun','Свимран Воронеж','Свимран Воронеж','IRONSTAR','2027-06-05',0,'Воронеж','Россия','ru',['swr'],'0,8 км плавание + 6,8 км бег',IS+'svimran-voronezh-2027','ok','Слоты проданы');
+E('run','IRONLADY / MANSTAR, Воронеж','5 км Воронеж','IRONSTAR','2027-06-05',0,'Воронеж','Россия','ru',['run_s'],'5 км',IS+'ironlady-voronezh-2027');
+E('tri','IRONSTAR Завидово: ¼, Супермикс, ⅛','IRONSTAR Завидово','IRONSTAR','2027-08-29',0,'Завидово, Тверская обл.','Россия','ru',['tri_s','tri_o'],'¼: 1 / 45 / 10 км · Супермикс: 1,5 / 67 / 15 км · ⅛: 0,5 / 22 / 5 км',IS+'ironstar-1-4-zavidovo-2027');
+E('swim','SWIMSTAR Завидово','SWIMSTAR Завидово','IRONSTAR','2027-08-28',0,'Завидово, Тверская обл.','Россия','ru',['sw_s','sw_m'],'1 км, 1 миля (1,85 км), 2 мили (3,7 км), эстафета 2 × 1 км',IS+'swimstar-2-mili-zavidovo-2027');
+E('swimrun','Свимран Завидово','Свимран Завидово','IRONSTAR','2027-08-28',0,'Завидово, Тверская обл.','Россия','ru',['swr'],'0,8 км плавание + 6,8 км бег',IS+'svimran-zavidovo-2027');
+E('run','IRONLADY / MANSTAR, Завидово','5 км Завидово','IRONSTAR','2027-08-28',0,'Завидово, Тверская обл.','Россия','ru',['run_s'],'5 км',IS+'ironlady-zavidovo-2027');
+
+/* ---------- X-WATERS ---------- */
+E('swim','X-WATERS Гранд Шоу 2026','XW Гранд Шоу','X-WATERS','2026-11-28',0,'Место — на сайте','Россия','ru',[],XWD,XW+'grandshow/');
+E('swim','X-WATERS Таиланд','XW Таиланд','X-WATERS','2027-03-27',0,'Пхукет','Таиланд','asia',[],XWD,XW+'thailand/');
+E('swim','X-WATERS Анталья','XW Анталья','X-WATERS','2027-05-08','2027-05-09','Анталья','Турция','world',[],XWD,XW+'antalya/');
+E('swim','X-WATERS Белград','XW Белград','X-WATERS','2027-05-16',0,'Белград, оз. Ада Циганлия','Сербия','world',[],XWD,XW+'belgrad/','est',EST+' (17 мая 2026). Регистрация «скоро».');
+E('swim','X-WATERS Азовское море','XW Азовское море','X-WATERS','2027-05-21','2027-05-23','Ейский район, коса Долгая','Россия','ru',[],XWD,XW+'x-waters-azovskoe-more/');
+E('swim','X-WATERS Запольское','XW Запольское','X-WATERS','2027-06-04','2027-06-05','Владимирская обл., оз. Запольское','Россия','ru',[],XWD,XW+'x-waters-zapolskoe/');
+E('swim','X-WATERS МСК Красногорск','XW Красногорск','X-WATERS','2027-06-06',0,'Красногорск, р. Москва','Россия','ru',[],XWD,XW+'x-waters-krasnogorsk/');
+E('swim','X-WATERS МСК Истра','XW Истра','X-WATERS','2027-06-19',0,'Истринское вдхр.','Россия','ru',[],XWD,XW+'x-waters-msk-istra/');
+E('swim','X-WATERS Муром','XW Муром','X-WATERS','2027-06-26',0,'Муром, р. Ока','Россия','ru',[],XWD,XW+'x-waters-murom/');
+E('swim','X-WATERS Уфа','XW Уфа','X-WATERS','2027-07-03','2027-07-04','Уфа, р. Белая','Россия','ru',[],XWD,XW+'ufa/');
+E('swim','X-WATERS Урал','XW Урал','X-WATERS','2027-07-09','2027-07-11','Миасс, оз. Тургояк','Россия','ru',[],XWD,XW+'ural/');
+E('swim','X-WATERS Имандра','XW Имандра','X-WATERS','2027-07-10',0,'Мончегорск, оз. Имандра','Россия','ru',[],XWD,XW+'imandra/');
+E('swim','X-WATERS Калининград','XW Калининград','X-WATERS','2027-07-17',0,'Янтарный, Синявинское оз.','Россия','ru',[],XWD,XW+'kaliningrad/','est',EST+' (18 июля 2026).');
+E('swim','X-WATERS Волга','XW Волга','X-WATERS','2027-07-23','2027-07-24','Нижний Новгород','Россия','ru',[],XWD,XW+'volga/');
+E('swim','X-WATERS МСК Солнечногорск','XW Солнечногорск','X-WATERS','2027-07-31','2027-08-01','Солнечногорск, оз. Сенеж','Россия','ru',[],XWD,XW+'solnechnogorsk/');
+E('swim','X-WATERS Калуга','XW Калуга','X-WATERS','2027-08-06','2027-08-08','Калуга','Россия','ru',[],XWD,XW+'kaluga/');
+E('swim','X-WATERS Арктика','XW Арктика','X-WATERS','2027-08-07','2027-08-08','Териберка','Россия','ru',[],XWD,XW+'arctic/');
+E('swim','X-WATERS МСК Руза','XW Руза','X-WATERS','2027-08-14',0,'Рузское вдхр.','Россия','ru',[],XWD,XW+'moscow-ruza/');
+E('swim','X-WATERS Санкт-Петербург','XW Петербург','X-WATERS','2027-08-20','2027-08-21','Санкт-Петербург, Елагин остров','Россия','ru',[],XWD,XW+'saint-petersburg/');
+E('swim','X-WATERS Банное','XW Банное','X-WATERS','2027-08-21',0,'Башкортостан, оз. Банное','Россия','ru',[],XWD,XW+'bannoe/','est',EST+' (21–22 августа 2026).');
+E('swim','X-WATERS Иссык-Куль','XW Иссык-Куль','X-WATERS','2027-08-28',0,'оз. Иссык-Куль','Киргизия','asia',[],XWD,XW+'issyk-kul/','est',EST+' (28–29 августа 2026).');
+E('swim','X-WATERS Владивосток','XW Владивосток','X-WATERS','2027-09-11','2027-09-12','Владивосток, Босфор Восточный','Россия','ru',[],XWD,XW+'vladivostok/');
+E('swim','X-WATERS Словения','XW Словения','X-WATERS','2027-09-11','2027-09-12','оз. Блед','Словения','world',[],XWD,XW+'slovenia/');
+E('swim','X-WATERS Нуклеар','XW Нуклеар','X-WATERS','2027-09-17','2027-09-18','Десногорск, Смоленская обл.','Россия','ru',[],XWD,XW+'nuclear/');
+E('swim','X-WATERS Черногория','XW Черногория','X-WATERS','2027-09-25','2027-09-26','Рисан, Которский залив','Черногория','world',[],XWD,XW+'montenegro/');
+
+/* ---------- Беговое сообщество ---------- */
+const RC='Беговое сообщество';
+E('run','Соревнования «Скорость»','«Скорость»','%','2026-11-21','2026-11-22','Москва','Россия','ru',['run_s'],'Спринт и средние дистанции','https://runc.run/');
+E('run','Соревнования «Скорость» (зимние)','«Скорость»','%','2027-02-20','2027-02-21','Москва','Россия','ru',['run_s'],'Спринт и средние дистанции','https://runc.run/','est',EST+' (21–22 февраля 2026).');
+E('run','Забег «Апрель»','«Апрель» 5 км','%','2027-04-04',0,'Москва','Россия','ru',['run_s'],'5 км','https://aprilrun5km.runc.run/','est',EST+' (5 апреля 2026).');
+E('run','Московский полумарафон','Моск. полумарафон','%','2027-04-24','2027-04-25','Москва','Россия','ru',['run_h','run_s'],'21,1 км, 5 км, корпоративная эстафета','https://moscowhalf.runc.run/','est',EST+' (25–26 апреля 2026).');
+E('run','Эстафета по Садовому кольцу','Садовое кольцо','%','2027-05-15',0,'Москва','Россия','ru',['run_s'],'15 км, эстафета','https://gardenring.runc.run/','est',EST+' (16 мая 2026).');
+E('run','Красочный забег','Красочный 5 км','%','2027-06-06',0,'Москва','Россия','ru',['run_s'],'5 км','https://colorrun5km.runc.run/','est',EST+' (7 июня 2026).');
+E('run','Ночной забег','Ночной 10 км','%','2027-06-19',0,'Москва','Россия','ru',['run_s'],'10 км','https://nightrun10km.runc.run/','est',EST+' (20 июня 2026).');
+E('run','Марафон «Белые ночи»','Белые ночи','%','2027-07-03',0,'Санкт-Петербург','Россия','ru',['run_m','run_s'],'42,2 км, 10 км, эстафета','https://wnmarathon.runc.run/','est',EST+' (4 июля 2026).');
+E('run','СПб полумарафон «Северная столица»','СПб полумарафон','%','2027-08-08',0,'Санкт-Петербург','Россия','ru',['run_h','run_s'],'21,1 км, 10 км, эстафета','https://spbhalf.runc.run/','est',EST+' (9 августа 2026).');
+E('run','Большой фестиваль бега','Фестиваль бега','%','2027-08-22',0,'Москва, Садовое кольцо','Россия','ru',['run_s'],'5 км, 10 км','https://runfest.runc.run/','est',EST+' (23 августа 2026).');
+E('run','Московский марафон','Моск. марафон','%','2027-09-25','2027-09-26','Москва','Россия','ru',['run_m','run_s'],'42,2 км, 10 км, эстафеты','https://moscowmarathon.runc.run/','est',EST+' (26–27 сентября 2026).');
+E('run','Соревнования «Скорость»','«Скорость»','%','2027-11-20','2027-11-21','Москва','Россия','ru',['run_s'],'Спринт и средние дистанции','https://runc.run/','est',EST+' (21–22 ноября 2026).');
+EV.forEach(e=>{if(e.series==='%')e.series=RC;});
+
+/* ---------- Russia Running (крупные старты) ---------- */
+const RR='RussiaRunning';
+E('run','Сочи Марафон','Сочи Марафон',RR,'2026-10-31','2026-11-01','Сочи','Россия','ru',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 5 / 2,5 км','https://russiarunning.com/','ok','Юбилейный, десятый');
+E('run','Казанский марафон','Казанский марафон',RR,'2027-05-01','2027-05-03','Казань','Россия','ru',['run_m','run_h','run_s'],'1 мая — 10 км · 2 мая — 21,1 км · 3 мая — 42,2 км','https://kazan.run/','ok','Регистрация откроется позже');
+E('run','ЗаБег.РФ — всероссийский полумарафон','ЗаБег.РФ',RR,'2027-05-22',0,'Синхронно в городах России','Россия','ru',['run_h','run_s'],'21,1 / 10 / 5 км','https://xn--80acghh.xn--p1ai/');
+E('tri','Фестиваль триатлона «Энергия Русского Севера»','Энергия Рус. Севера',RR,'2027-06-25','2027-06-27','Череповец','Россия','ru',['tri_s','tri_o','tri_h','tri_f'],'В 2026: спринт, олимпийка, 113, 226 + заплывы и забеги','https://russiarunning.com/');
+E('run','Челябинский марафон','Челябинский марафон',RR,'2027-08-21','2027-08-22','Челябинск','Россия','ru',['run_m','run_h','run_s'],'Марафон, полумарафон, короткие дистанции','https://russiarunning.com/','est',EST+' (22–23 августа 2026).');
+E('run','Пермский марафон (юбилейный)','Пермский марафон',RR,'2027-09-04','2027-09-05','Пермь','Россия','ru',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 5 / 2,5 км, эстафета «Экиден»','https://permmarathon.ru/','ok','В новостях встречается и 5–6 сентября. Регистрация открыта.');
+E('run','Полумарафон «Моя столица» (финал «Бегом по Золотому кольцу»)','«Моя столица»','Золотое кольцо','2027-10-09','2027-10-10','Москва, Воробьёвы горы','Россия','ru',['run_h','run_s'],'9 окт — 5 км · 10 окт — 10 и 21,1 км','https://moscowhalf.ru/');
+
+/* ---------- T100 ---------- */
+const T100D='T100: 2 / 80 / 18 км (100 км). На этапах обычно есть и короткие любительские дистанции';
+E('tri','Dubai T100','T100 Дубай','T100','2026-11-13','2026-11-15','Дубай','ОАЭ','world',['tri_h'],T100D,T1+'dubai/participate');
+E('tri','Saudi Arabia T100','T100 Сауд. Аравия','T100','2026-11-27','2026-11-28','Город уточняется','Саудовская Аравия','world',['tri_h'],T100D,T1+'saudi-arabia/participate/');
+E('tri','Qatar T100 — финал сезона','T100 Катар финал','T100','2026-12-10','2026-12-12','Доха','Катар','world',['tri_h'],T100D,T1+'qatar/participate');
+E('tri','Gold Coast T100','T100 Голд-Кост','T100','2027-03-20','2027-03-21','Голд-Кост, Квинсленд','Австралия','world',['tri_h'],T100D,T1+'gold-coast/participate/');
+E('tri','Singapore T100','T100 Сингапур','T100','2027-04-10','2027-04-11','Сингапур','Сингапур','asia',['tri_h'],T100D,T1+'singapore/participate/');
+E('tri','French Riviera T100','T100 Фр. Ривьера','T100','2027-05-15',0,'Фрежюс — Сен-Рафаэль','Франция','world',['tri_h'],T100D,T1+'french-riviera/pro/');
+E('tri','Marbella T100','T100 Марбелья','T100','2027-09-18','2027-09-19','Марбелья','Испания','world',['tri_h'],T100D,T1+'marbella/participate/');
+E('tri','Saudi Arabia T100','T100 Сауд. Аравия','T100','2027-11-26','2027-11-27','Город уточняется','Саудовская Аравия','world',['tri_h'],T100D,TW);
+E('tri','Qatar T100 — финал сезона','T100 Катар финал','T100','2027-12-10','2027-12-11','Доха','Катар','world',['tri_h'],T100D,TW);
+
+
+/* ---------- Challenge ---------- */
+const CH='Challenge', C100='«100»: 2 / 80 / 18 км';
+E('tri','Challenge Xiamen','Challenge Сямэнь',CH,'2026-11-07',0,'Сямэнь','Китай','asia',['tri_h','tri_o','tri_s'],'Средняя, олимпийская, спринт',CF+'challenge-xiamen/');
+E('tri','Challenge Canberra','Challenge Канберра',CH,'2026-11-22',0,'Канберра','Австралия','world',['tri_h','tri_o','tri_s'],'Средняя, олимпийская, спринт, аквабайк',CF+'challenge-canberra/');
+E('tri','Challenge Israman','Israman',CH,'2027-01-29',0,'Эйлат','Израиль','world',['tri_f','tri_h'],'Длинная и средняя',CF+'challenge-israman/');
+E('tri','Challenge Sir Bani Yas','Challenge Сир-Бани-Яс',CH,'2027-01-30',0,'о. Сир-Бани-Яс, Абу-Даби','ОАЭ','world',['tri_f','tri_h','tri_o'],'Длинная, средняя, олимпийская',CF+'challenge-sir-bani-yas/');
+E('tri','Challenge Wānaka','Challenge Ванака',CH,'2027-02-20',0,'оз. Ванака','Новая Зеландия','world',['tri_h'],C100+', аквабайк',CF+'challenge-wanaka/');
+E('tri','Anfi Challenge Mogán-Gran Canaria','Challenge Гран-Канария',CH,'2027-04-17',0,'Гран-Канария','Испания','world',['tri_h','tri_o'],C100+', олимпийская',CF+'challenge-mogan-gran-canaria/');
+E('tri','Challenge Taiwan','Challenge Тайвань',CH,'2027-04-24',0,'Тайтун','Тайвань','asia',['tri_f','tri_h','tri_o','tri_s'],'Длинная, средняя, олимпийская, спринт',CF+'challenge-taiwan/');
+E('tri','Challenge Salou-Costa Daurada','Challenge Салоу',CH,'2027-05-09',0,'Салоу','Испания','world',['tri_h','tri_o'],C100+', олимпийская',CF+'challenge-salou-costa-daurada/');
+E('tri','Challenge Cesenatico','Challenge Чезенатико',CH,'2027-05-16',0,'Чезенатико','Италия','world',['tri_h','tri_s'],C100+', спринт',CF+'challenge-cesenatico/');
+E('tri','The Championship (Challenge)','The Championship',CH,'2027-05-23',0,'Шаморин','Словакия','world',['tri_h','tri_o','tri_s'],C100+', олимпийская, спринт',CF+'the-championship/');
+E('tri','Challenge Gunsan-Saemangeum','Challenge Кунсан',CH,'2027-05-30',0,'Кунсан','Южная Корея','asia',['tri_h','tri_o'],'Средняя, олимпийская',CF+'challenge-gunsan-saemangeum/');
+E('tri','Challenge Gdańsk','Challenge Гданьск',CH,'2027-06-20',0,'Гданьск','Польша','world',['tri_h','tri_s'],C100+', спринт',CF+'challenge-gdansk/');
+E('tri','Challenge Kaiserwinkl-Walchsee','Challenge Вальхзее',CH,'2027-06-27',0,'Вальхзее','Австрия','world',['tri_h'],C100+', аквабайк',CF+'challenge-kaiserwinkl-walchsee/');
+E('tri','DATEV Challenge Roth','Challenge Roth',CH,'2027-07-04',0,'Рот','Германия','world',['tri_f'],'Длинная: 3,8 / 180 / 42,2 км',CF+'challenge-roth/');
+E('tri','Challenge Samarkand','Challenge Самарканд',CH,'2027-08-22',0,'Самарканд','Узбекистан','asia',['tri_h','tri_s'],'Средняя, спринт',CF+'challenge-samarkand/');
+E('tri','Challenge Almere-Amsterdam','Challenge Алмере',CH,'2027-09-11',0,'Алмере','Нидерланды','world',['tri_f','tri_h'],'Длинная, средняя, аквабайк',CF+'challenge-almere-amsterdam/');
+E('tri','Challenge Vieux-Boucau','Challenge Вьё-Буко',CH,'2027-10-09','2027-10-10','Вьё-Буко','Франция','world',['tri_h'],'Средняя / 100 и короткие',CF+'challenge-vieux-boucau/');
+E('tri','Challenge Peguera-Mallorca','Challenge Майорка',CH,'2027-10-16','2027-10-17','Майорка','Испания','world',['tri_h'],'Средняя / 100',CF+'challenge-peguera-mallorca/');
+E('tri','Challenge Forte Village','Challenge Форте-Виллидж',CH,'2027-10-23','2027-10-24','Сардиния','Италия','world',['tri_h','tri_s'],'Средняя / 100, спринт',CF+'challenge-forte-village/');
+E('tri','Challenge Xiamen','Challenge Сямэнь',CH,'2027-11-06','2027-11-07','Сямэнь','Китай','asia',['tri_h','tri_o','tri_s'],'Средняя / 100 и короткие',CF+'challenge-xiamen/');
+
+/* ---------- Азия: другие триатлоны ---------- */
+const IM='IRONMAN', OT='Другие';
+E('tri','IRONMAN 70.3 Thailand (Пхукет)','IM 70.3 Пхукет',IM,'2026-11-08',0,'Пхукет','Таиланд','asia',['tri_h'],'1,9 / 90 / 21,1 км','https://www.ironman.com/races','est','Дата из стороннего календаря, на ironman.com не сверена');
+E('tri','Laguna Phuket Triathlon','Laguna Phuket Tri',OT,'2026-11-15',0,'Пхукет, Лагуна','Таиланд','asia',['tri_o','tri_s'],'1,8 / 50 / 12 км, спринт, дуатлон','https://www.lagunaphukettri.com/');
+E('tri','IRONMAN Malaysia и 70.3 Langkawi','IRONMAN Лангкави',IM,'2026-11-21',0,'Лангкави','Малайзия','asia',['tri_f','tri_h'],'226 и 113 км','https://www.ironman.com/races');
+E('tri','IRONMAN 70.3 Bangsaen','IM 70.3 Бангсаен',IM,'2027-02-14',0,'Бангсаен, Чонбури','Таиланд','asia',['tri_h'],'1,9 / 90 / 21,1 км','https://www.ironman.com/races','est','Известно только «середина февраля 2027»');
+E('tri','IRONMAN 70.3 Colombo','IM 70.3 Коломбо',IM,'2027-02-21',0,'Коломбо, Port City','Шри-Ланка','asia',['tri_h'],'1,9 / 90 / 21,1 км','https://www.ironman.com/races','est',EST+' (22 февраля 2026).');
+E('tri','TriFactor Bintan Triathlon','TriFactor Бинтан',OT,'2027-05-09',0,'о. Бинтан','Индонезия','asia',[],'Дистанции — на сайте','https://www.ahotu.com/calendar/triathlon/asia');
+E('tri','IRONMAN Gurye','IRONMAN Курье',IM,'2027-10-03',0,'Курье','Южная Корея','asia',['tri_f'],'3,8 / 180 / 42,2 км','https://www.ironman.com/races','est',EST+' (4 октября 2026).');
+
+
+/* ---------- Бегом по Золотому кольцу ---------- */
+const GR='Золотое кольцо', GRU='http://goldenringrun.ru/';
+E('run','Полумарафон «Май. Мир. Молодость»','ЗК Тутаев',GR,'2027-05-01',0,'Тутаев','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Полумарафон «По шести холмам»','ЗК Мышкин',GR,'2027-05-16',0,'Мышкин','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Марафон «Александровские вёрсты»','ЗК Переславль',GR,'2027-05-30',0,'Переславль-Залесский','Россия','ru',['run_m'],'Марафон и короткие дистанции',GRU);
+E('run','Полумарафон «Здорово, Кострома!»','ЗК Кострома',GR,'2027-06-12',0,'Кострома','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Полумарафон «Волжский берег»','ЗК Углич',GR,'2027-06-27',0,'Углич','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Полумарафон «Сергиевым путём»','ЗК Сергиев Посад',GR,'2027-07-10',0,'Сергиев Посад','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Полумарафон «Великий хлебный путь»','ЗК Рыбинск',GR,'2027-08-14',0,'Рыбинск','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Полумарафон «Ростов Великий»','ЗК Ростов',GR,'2027-08-22',0,'Ростов Великий','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+E('run','Полумарафон «Золотое кольцо»','ЗК Ярославль',GR,'2027-09-05',0,'Ярославль','Россия','ru',['run_h'],'Полумарафон и короткие дистанции',GRU);
+
+/* ---------- KAVKAZ.RUN ---------- */
+const KV='KAVKAZ.RUN', KU='https://kavkaz.run/';
+E('run','Благотворительный забег KAVKAZ.RUN','KAVKAZ благотв.',KV,'2027-03-28',0,'Кавминводы','Россия','ru',['run_s'],'Короткие дистанции',KU,'est',EST+' (29 марта 2026).');
+E('run','Ультра Кисловодск / Grand Kislovodsk','Ультра Кисловодск',KV,'2027-05-01','2027-05-02','Кисловодск','Россия','ru',[],'Трейл и ультра, дистанции на сайте',KU,'est',EST+' (2–3 мая 2026).');
+E('run','Ставропольский полумарафон ЗаБег.РФ','Ставроп. полумарафон',KV,'2027-05-22',0,'Ставрополь','Россия','ru',['run_h','run_s'],'21,1 км и короткие',KU+'stavropol','est','В 2026 проходил в день ЗаБег.РФ; ЗаБег.РФ-2027 — 22 мая');
+E('run','BeautyRun','BeautyRun',KV,'2027-06-19',0,'Пятигорск','Россия','ru',['run_s'],'Короткие дистанции',KU+'beautyrun','est',EST+' (20 июня 2026).');
+E('swimrun','SwimRun KAVKAZ.RUN','KAVKAZ SwimRun',KV,'2027-06-19',0,'Кавминводы','Россия','ru',['swr'],'Плавание + бег, дистанции на сайте',KU,'est',EST+' (20 июня 2026).');
+E('run','Ночной горный трейл «Пять вершин»','Трейл «Пять вершин»',KV,'2027-07-18',0,'Пятигорск','Россия','ru',[],'Горный трейл, дистанции на сайте',KU+'five_peaks','est',EST+' (19 июля 2026).');
+E('run','Георгиевская десятка','Георгиевская 10',KV,'2027-08-07',0,'Георгиевск','Россия','ru',['run_s'],'10 км',KU+'georgievsk','est',EST+' (8 августа 2026).');
+E('run','Пятигорский полумарафон и «Машук 993»','Пятигорский полумарафон',KV,'2027-08-28','2027-08-29','Пятигорск','Россия','ru',['run_h','run_s'],'Полумарафон, «Пятигорское кольцо», вертикальный забег на Машук',KU+'pyatigorsk_ring','est',EST+' (29–30 августа 2026).');
+E('run','Кисловодский марафон','Кисловодский марафон',KV,'2027-10-02','2027-10-03','Кисловодск','Россия','ru',['run_m','run_h','run_s'],'42,2 / 21,2 / 10,6 / 4,3 км, эстафета 4 × 10 км',KU+'kislovodsk','est',EST+' (3–4 октября 2026).');
+
+/* ---------- ПроСпорт40 и SwimSupRun ---------- */
+const PS='ПроСпорт40', PSU='https://xn--40-emcadbfdgn.xn--p1ai/public/events';
+E('tri','Калужский космический триатлон','Калужский триатлон',PS,'2027-06-19','2027-06-20','Калуга','Россия','ru',['tri_h','tri_s'],'В 2026: средняя дистанция (90 км вело по кольцу Калуги) и короткие',PSU,'est',EST+' (20–21 июня 2026).');
+E('run','Калужский космический марафон','Калужский марафон',PS,'2027-08-28','2027-08-29','Калуга','Россия','ru',['run_m','run_h','run_s'],'Марафон, полумарафон, короткие дистанции',PSU,'est',EST+' (29–30 августа 2026).');
+E('tri','Тульский триатлон','Тульский триатлон','SwimSupRun','2027-08-15',0,'Тула, Центральный парк','Россия','ru',['tri_s'],'Суперспринт и спринт, эстафеты','http://swimsuprun.ru/future','est','Дата 2026 не нашлась; в 2025 прошёл 17 августа');
+
+/* ---------- Другие российские ---------- */
+E('run','Гатчинский полумарафон','Гатчинский полумарафон',OT,'2026-11-08',0,'Гатчина','Россия','ru',['run_h','run_s'],'21,1 км, 10 км, 2 км','https://gatchinahalf.ru/');
+E('run','Гатчинский полумарафон','Гатчинский полумарафон',OT,'2027-11-07',0,'Гатчина','Россия','ru',['run_h','run_s'],'21,1 км, 10 км, 2 км','https://gatchinahalf.ru/','est',EST+' (8 ноября 2026).');
+E('run','ЗаБег.РФ Архангельск','ЗаБег.РФ Архангельск',RR,'2027-05-22',0,'Архангельск','Россия','ru',['run_h','run_s'],'21,1 / 10 / 5 / 1 км','https://xn--80acghh.xn--p1ai/');
+E('run','Архангельский марафон «Гандвик»','«Гандвик»',OT,'2027-06-19',0,'Архангельск, стадион «Труд»','Россия','ru',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 5 / 1 км','https://pomorland.travel/event-calendar/12955/','est',EST+' (20 июня 2026).');
+
+/* ---------- Марафоны Азии и ближнего зарубежья ---------- */
+const MA='Марафоны Азии и СНГ';
+E('run','JTBC Seoul Marathon','JTBC Сеул',MA,'2026-11-01',0,'Сеул','Южная Корея','asia',['run_m','run_s'],'42,2 км, 10 км','https://www.ahotu.com/event/jtbc-seoul-marathon');
+E('run','Samarkand Marathon','Самарканд марафон',MA,'2026-11-07','2026-11-08','Самарканд','Узбекистан','cis',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 5 км и детские','https://www.finishers.com/en/event/samarkand-marathon');
+E('run','Shanghai Marathon','Шанхай марафон',MA,'2026-12-06',0,'Шанхай','Китай','asia',['run_m'],'42,2 км','https://marathontours.com/en-us/events/shanghai-marathon/');
+E('run','Guangzhou Marathon','Гуанчжоу марафон',MA,'2026-12-20',0,'Гуанчжоу','Китай','asia',['run_m','run_h'],'42,2 / 21,1 км','https://www.ahotu.com/event/guangzhou-marathon');
+E('run','Карнавальный пробег КЛБ «Аматар»','Карнавальный пробег',MA,'2026-12-27',0,'Минск','Беларусь','cis',['run_s'],'12 км, 1 км','https://klbamatar.by');
+E('run','Xiamen Marathon','Сямэнь марафон',MA,'2027-01-10',0,'Сямэнь','Китай','asia',['run_m','run_h'],'42,2 / 21,1 км','https://www.ahotu.com/event/c-d-xiamen-marathon');
+E('run','Standard Chartered Hong Kong Marathon','Гонконг марафон',MA,'2027-01-17',0,'Гонконг','Китай','asia',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 км','https://www.ahotu.com/event/standard-chartered-hong-kong-marathon');
+E('run','Kyoto Marathon','Киото марафон',MA,'2027-02-21',0,'Киото','Япония','asia',['run_m'],'42,2 км','https://kyoto-marathon.com/en/info/');
+E('run','Osaka Marathon','Осака марафон',MA,'2027-02-28',0,'Осака','Япония','asia',['run_m'],'42,2 км','https://www.ahotu.com/calendar/running/osaka-270008-jpn','est','Известно только «конец февраля 2027»');
+E('run','Tokyo Marathon','Токио марафон',MA,'2027-03-07',0,'Токио','Япония','asia',['run_m'],'42,2 км (World Marathon Majors)','https://www.marathon.tokyo/en/');
+E('run','Seoul Marathon','Сеул марафон',MA,'2027-03-21',0,'Сеул','Южная Корея','asia',['run_m','run_s'],'42,2 км, 10 км','https://www.ahotu.com/event/seoul-marathon');
+E('run','Tashkent International Marathon','Ташкент марафон',MA,'2027-04-04',0,'Ташкент','Узбекистан','cis',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 5 км','https://www.finishers.com/en/event/tashkent-international-marathon','est','Известно только «начало апреля 2027»');
+E('run','Bukhara Night Race','Бухара ночной забег',MA,'2027-04-17',0,'Бухара','Узбекистан','cis',['run_h','run_s'],'21,1 / 10 / 5 / 2 км','https://www.finishers.com/en/destinations/asia/uzbekistan','est','Известно только «середина апреля 2027»');
+E('run','Иссык-Куль марафон Run the Silk Road (ШОС)','Иссык-Куль марафон',MA,'2027-05-01',0,'Чолпон-Ата','Киргизия','cis',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 3 км','https://runthesilkroad.com/en/','est',EST+' (2 мая 2026).');
+E('tri','IRONSTAR Минск','IRONSTAR Минск','IRONSTAR','2027-06-12','2027-06-13','Минск','Беларусь','cis',['tri_o','tri_h'],'В 2026: олимпийка и 113, заплывы и забеги','https://iron-star.com/event/','est','Дата 2027 не объявлена: в 2026 прошёл 6–7 июня. Показан условно в середине июня');
+E('tri','Sevan Half Distance Triathlon','Севан триатлон 113',OT,'2027-09-05',0,'Цовагюх, оз. Севан','Армения','cis',['tri_h'],'1,9 / 90 / 21,1 км','https://www.ahotu.com/calendar/armenia','est',EST+' (6 сентября 2026).');
+E('run','Минский полумарафон','Минский полумарафон',MA,'2027-09-05',0,'Минск','Беларусь','cis',['run_h','run_s'],'Полумарафон и короткие дистанции','https://minskhalfmarathon.by/','est',EST+' (6 сентября 2026).');
+E('run','Tbilisi Marathon','Тбилиси',MA,'2027-09-26',0,'Тбилиси','Грузия','cis',['run_h','run_s'],'21,1 км, 10 км','https://www.tbilisimarathon.ge/en','est',EST+' (27 сентября 2026).');
+E('run','Yerevan Marathon','Ереван марафон',MA,'2027-10-16','2027-10-17','Ереван','Армения','cis',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 км и короткие','https://www.armeniamarathon.org/events/yerevan-marathon','est',EST+' (17–18 октября 2026).');
+E('run','Beijing Marathon','Пекин марафон',MA,'2027-10-17',0,'Пекин','Китай','asia',['run_m'],'42,2 км','https://www.ahotu.com/event/beijing-marathon','est',EST+' (18 октября 2026).');
+E('run','JTBC Seoul Marathon','JTBC Сеул',MA,'2027-10-31',0,'Сеул','Южная Корея','asia',['run_m','run_s'],'42,2 км, 10 км','https://www.ahotu.com/event/jtbc-seoul-marathon','est',EST+' (1 ноября 2026).');
+E('run','Samarkand Marathon','Самарканд марафон',MA,'2027-11-06','2027-11-07','Самарканд','Узбекистан','cis',['run_m','run_h','run_s'],'42,2 / 21,1 / 10 / 5 км и детские','https://www.finishers.com/en/event/samarkand-marathon','est',EST+' (7–8 ноября 2026).');
+
+/* ---------- helpers ---------- */
+const MS=86400000;
+const ts=s=>Date.UTC(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10));
+EV.forEach(e=>{e.a=ts(e.start);e.b=ts(e.end);if(CIS.has(e.country))e.region='cis';});
+EV.sort((x,y)=>x.a-y.a||x.name.localeCompare(y.name));
+const MON=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const MONG=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const DOW=['пн','вт','ср','чт','пт','сб','вс'];
+const fmt=t=>{const d=new Date(t);return d.getUTCDate()+' '+MONG[d.getUTCMonth()];};
+const fmtRange=e=>{if(e.a===e.b)return fmt(e.a);const A=new Date(e.a),B=new Date(e.b);return A.getUTCMonth()===B.getUTCMonth()?A.getUTCDate()+'–'+B.getUTCDate()+' '+MONG[B.getUTCMonth()]:fmt(e.a)+' – '+fmt(e.b);};
+const dowOf=t=>DOW[(new Date(t).getUTCDay()+6)%7];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RANGE_A=ts('2026-11-01'),RANGE_B=ts('2027-12-31');
+
+let stars=new Set();
+try{stars=new Set(JSON.parse(localStorage.getItem(ID_STAR)||'[]'));}catch(e){}
+const saveStars=()=>{try{localStorage.setItem(ID_STAR,JSON.stringify([...stars]));}catch(e){}};
+
+const st={q:'',sport:new Set(),dist:new Set(),region:new Set(),country:'',series:new Set(),conf:false,star:false,view:'cal',month:{y:2026,m:10},day:null};
+
+/* ---------- filters UI ---------- */
+function chipRow(el,items,set){
+  el.innerHTML=items.map(([k,label,c])=>`<button class="chip" type="button" data-k="${esc(k)}" aria-pressed="${set.has(k)}">${c?`<i class="dot" style="--c:${c}"></i>`:''}${esc(label)}</button>`).join('');
+  el.onclick=ev=>{const b=ev.target.closest('.chip');if(!b)return;const k=b.dataset.k;set.has(k)?set.delete(k):set.add(k);render();};
+}
+const countries=[...new Set(EV.map(e=>e.country))].sort((a,b)=>a==='Россия'?-1:b==='Россия'?1:a.localeCompare(b,'ru'));
+const seriesList=['IRONSTAR','X-WATERS','Беговое сообщество','RussiaRunning','Золотое кольцо','KAVKAZ.RUN','ПроСпорт40','SwimSupRun','T100','Challenge','IRONMAN','Марафоны Азии и СНГ','Другие'];
+function drawFilters(){
+  chipRow(document.getElementById('f-sport'),Object.entries(SPORTS).map(([k,v])=>[k,v.n,v.c]),st.sport);
+  const dk=Object.entries(DIST).filter(([k,v])=>!st.sport.size||st.sport.has(v[0]));
+  chipRow(document.getElementById('f-dist'),dk.map(([k,v])=>[k,v[1],SPORTS[v[0]].c]),st.dist);
+  chipRow(document.getElementById('f-region'),Object.entries(REG),st.region);
+  chipRow(document.getElementById('f-series'),seriesList.map(s=>[s,s]),st.series);
+  const sel=document.getElementById('f-country');
+  const avail=countries.filter(c=>!st.region.size||EV.some(e=>e.country===c&&st.region.has(e.region)));
+  if(st.country&&!avail.includes(st.country))st.country='';
+  sel.innerHTML='<option value="">Все страны</option>'+avail.map(c=>`<option ${c===st.country?'selected':''}>${esc(c)}</option>`).join('');
+}
+document.getElementById('f-country').onchange=e=>{st.country=e.target.value;render();};
+document.getElementById('q').oninput=e=>{st.q=e.target.value.trim().toLowerCase();render();};
+document.getElementById('f-conf').onchange=e=>{st.conf=e.target.checked;render();};
+document.getElementById('f-star').onchange=e=>{st.star=e.target.checked;render();};
+document.getElementById('reset').onclick=()=>{st.q='';st.sport.clear();st.dist.clear();st.region.clear();st.series.clear();st.country='';st.conf=false;st.star=false;document.getElementById('q').value='';document.getElementById('f-conf').checked=false;document.getElementById('f-star').checked=false;render();};
+if(matchMedia('(max-width:900px)').matches)document.getElementById('fdet').open=false;
+
+function filtered(){
+  return EV.filter(e=>{
+    if(e.b<RANGE_A||e.a>RANGE_B)return false;
+    if(st.sport.size&&!st.sport.has(e.sport))return false;
+    if(st.dist.size&&!e.tags.some(t=>st.dist.has(t)))return false;
+    if(st.region.size&&!st.region.has(e.region))return false;
+    if(st.country&&e.country!==st.country)return false;
+    if(st.series.size&&!st.series.has(e.series))return false;
+    if(st.conf&&e.status!=='ok')return false;
+    if(st.star&&!stars.has(e.id))return false;
+    if(st.q&&!(e.name+' '+e.city+' '+e.country+' '+e.series+' '+e.dist).toLowerCase().includes(st.q))return false;
+    return true;
+  });
+}
+
+/* ---------- strip ---------- */
+const W0=ts('2026-10-26'),W1=ts('2027-12-27');
+function drawStrip(list){
+  const strip=document.getElementById('strip'),ml=document.getElementById('mlabels');
+  let h='',lab='',lastM=-1;
+  for(let w=W0;w<=W1;w+=7*MS){
+    const we=w+6*MS;const evs=list.filter(e=>e.a<=we&&e.b>=w);
+    const d=new Date(w+3*MS);const isCur=d.getUTCFullYear()===st.month.y&&d.getUTCMonth()===st.month.m;
+    const shown=evs.slice(0,11);
+    h+=`<button class="wk${isCur?' cur':''}" type="button" data-w="${w}" title="${fmt(w)} – ${fmt(we)}: стартов ${evs.length}">`+shown.map(e=>`<i class="tick${e.status!=='ok'?' est':''}" style="--c:${SPORTS[e.sport].c}"></i>`).join('')+(evs.length>11?`<span class="more">+${evs.length-11}</span>`:'')+'</button>';
+    const m=new Date(w).getUTCMonth();
+    if(m!==lastM){lab+=`<span>${MON[m].slice(0,3)}${m===0?' ’'+String(new Date(w).getUTCFullYear()).slice(2):''}</span>`;lastM=m;}else lab+='<span></span>';
+  }
+  strip.innerHTML=h;ml.innerHTML=lab;
+  strip.onclick=ev=>{const b=ev.target.closest('.wk');if(!b)return;const d=new Date(+b.dataset.w+3*MS);st.month={y:d.getUTCFullYear(),m:d.getUTCMonth()};st.view='cal';st.day=null;render();document.getElementById('view-cal').scrollIntoView({behavior:'smooth',block:'start'});};
+}
+
+/* ---------- calendar ---------- */
+const minM={y:2026,m:10},maxM={y:2027,m:11};
+const mIdx=o=>o.y*12+o.m;
+function drawCal(list){
+  const {y,m}=st.month;
+  document.getElementById('mname').textContent=MON[m]+' '+y;
+  document.getElementById('prev').disabled=mIdx(st.month)<=mIdx(minM);
+  document.getElementById('next').disabled=mIdx(st.month)>=mIdx(maxM);
+  const first=Date.UTC(y,m,1),off=(new Date(first).getUTCDay()+6)%7,start=first-off*MS;
+  const days=new Date(Date.UTC(y,m+1,0)).getUTCDate();const cells=Math.ceil((off+days)/7)*7;
+  let h=DOW.map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<cells;i++){
+    const t=start+i*MS,d=new Date(t),inM=d.getUTCMonth()===m,wd=(d.getUTCDay()+6)%7;
+    const evs=inM?list.filter(e=>e.a<=t&&e.b>=t):[];
+    const busy=evs.length>1;
+    h+=`<div class="day${inM?'':' out'}${wd>4?' we':''}${st.day===t?' sel':''}${busy?' busy':''}" ${inM?`role="button" tabindex="0" data-t="${t}" aria-label="${d.getUTCDate()} ${MONG[m]}, стартов: ${evs.length}"`:''}><span class="dn">${d.getUTCDate()}</span>`+
+      evs.slice(0,4).map(e=>`<button class="ev${e.status!=='ok'?' est':''}${stars.has(e.id)?' star':''}${e.a<t?' cont':''}" type="button" data-id="${e.id}" style="--c:${SPORTS[e.sport].c}" title="${esc(e.name)}">${esc(e.short)}</button>`).join('')+
+      (evs.length>4?`<span class="evmore">ещё ${evs.length-4}</span>`:'')+'</div>';
+  }
+  const cal=document.getElementById('cal');cal.innerHTML=h;
+  cal.onclick=ev=>{const b=ev.target.closest('.ev');if(b&&!matchMedia('(max-width:640px)').matches){openModal(b.dataset.id);return;}const c=ev.target.closest('.day[data-t]');if(c){st.day=+c.dataset.t===st.day?null:+c.dataset.t;render();}};
+  cal.onkeydown=ev=>{if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('.day[data-t]')){ev.preventDefault();st.day=+ev.target.dataset.t===st.day?null:+ev.target.dataset.t;render();}};
+  const dp=document.getElementById('daypanel');
+  if(st.day!==null){
+    const dd=new Date(st.day);
+    if(dd.getUTCMonth()!==m){st.day=null;dp.hidden=true;return;}
+    const evs=list.filter(e=>e.a<=st.day&&e.b>=st.day);
+    dp.hidden=false;
+    dp.innerHTML=`<h3>${dd.getUTCDate()} ${MONG[m]}, ${dowOf(st.day)}: ${evs.length?('стартов — '+evs.length):'стартов нет'}</h3>`+evs.map(e=>itemHTML(e,list)).join('');
+  }else dp.hidden=true;
+}
+document.getElementById('prev').onclick=()=>{let {y,m}=st.month;m--;if(m<0){m=11;y--;}st.month={y,m};st.day=null;render();};
+document.getElementById('next').onclick=()=>{let {y,m}=st.month;m++;if(m>11){m=0;y++;}st.month={y,m};st.day=null;render();};
+
+/* ---------- list ---------- */
+function weekendKey(t){const d=new Date(t);const wd=(d.getUTCDay()+6)%7;return t-wd*MS;}
+function clashes(e,list){return list.filter(o=>o!==e&&o.a<=e.b+MS&&o.b>=e.a-MS).length;}
+function itemHTML(e,list){
+  const c=clashes(e,list);
+  return `<div class="item${e.status!=='ok'?' est':''}" style="--c:${SPORTS[e.sport].c}">
+    <div class="dt">${fmtRange(e)}<small>${dowOf(e.a)}${e.a!==e.b?'–'+dowOf(e.b):''}</small></div>
+    <div class="bar"></div>
+    <div style="min-width:0">
+      <button class="nm" type="button" data-id="${e.id}">${esc(e.name)}</button>
+      <div class="meta">${esc(e.city)} · ${esc(e.country)}</div>
+      <div class="dist">${esc(e.dist)}</div>
+      <div class="badges"><span class="b">${esc(e.series)}</span><span class="b">${SPORTS[e.sport].n}</span>${e.status!=='ok'?'<span class="b estb">дата ориентировочная</span>':''}${c?`<span class="b clash">рядом ещё ${c}</span>`:''}</div>
+    </div>
+    <button class="starbtn" type="button" data-star="${e.id}" aria-pressed="${stars.has(e.id)}" aria-label="В мой план">${stars.has(e.id)?'★':'☆'}</button>
+  </div>`;
+}
+function drawList(list){
+  const el=document.getElementById('view-list');
+  if(!list.length){el.innerHTML='<div class="empty">Под эти фильтры стартов нет. Ослабьте фильтры или нажмите «Сбросить».</div>';return;}
+  let h='',cur='';
+  list.forEach(e=>{const d=new Date(e.a);const k=MON[d.getUTCMonth()]+' '+d.getUTCFullYear();if(k!==cur){h+=`<div class="mhead">${k}</div>`;cur=k;}h+=itemHTML(e,list);});
+  el.innerHTML=h;
+}
+
+/* ---------- plan ---------- */
+function drawPlan(){
+  const el=document.getElementById('plan');
+  const ps=EV.filter(e=>stars.has(e.id)).sort((a,b)=>a.a-b.a);
+  if(!ps.length){el.innerHTML=`<div class="row"><h2 class="h2">Мой план</h2></div><p class="hint" style="margin:8px 0 0">Отмечайте старты звёздочкой ☆ в списке или в карточке старта. Здесь появится ваш сезон по порядку: где старты пересекаются и сколько дней между ними.</p>`;return;}
+  let h=`<div class="row"><h2 class="h2">Мой план · ${ps.length}</h2><span class="hint">Сохраняется только в этом браузере</span></div><ol>`;
+  ps.forEach((e,i)=>{
+    if(i>0){const p=ps[i-1];const gap=Math.round((e.a-p.b)/MS);
+      if(e.a<=p.b)h+=`<li><span class="gap bad">Пересекается с «${esc(p.short)}»</span></li>`;
+      else if(gap<14)h+=`<li><span class="gap warn">Между стартами всего ${gap} дн.</span></li>`;
+      else h+=`<li><span class="gap ok">${gap} дн. до следующего старта</span></li>`;}
+    h+=`<li style="--c:${SPORTS[e.sport].c}"><span class="dt" style="font-family:var(--f-mono);font-size:12.5px">${fmtRange(e)}</span><span style="min-width:0;display:flex;align-items:center;gap:8px"><i class="dot"></i><button class="nm" style="background:none;border:none;padding:0;font-weight:600;cursor:pointer;text-align:left" type="button" data-id="${e.id}">${esc(e.name)}</button><span class="hint">${esc(e.country)}</span></span><button class="x" type="button" data-star="${e.id}" aria-label="Убрать из плана">×</button></li>`;
+  });
+  el.innerHTML=h+'</ol>';
+}
+
+/* ---------- modal ---------- */
+const ovl=document.getElementById('ovl');
+function openModal(id){
+  const e=EV.find(x=>x.id===id);if(!e)return;
+  ovl.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-label="${esc(e.name)}" style="--c:${SPORTS[e.sport].c}">
+    <div class="hint">${SPORTS[e.sport].n} · ${esc(e.series)}</div>
+    <h3>${esc(e.name)}</h3>
+    ${e.note?`<div class="note">${esc(e.note)}</div>`:''}
+    <dl><dt>Даты</dt><dd>${fmtRange(e)} ${new Date(e.a).getUTCFullYear()} (${dowOf(e.a)}${e.a!==e.b?'–'+dowOf(e.b):''})${e.status!=='ok'?' · ориентировочно':''}</dd>
+    <dt>Место</dt><dd>${esc(e.city)}, ${esc(e.country)}</dd>
+    <dt>Дистанции</dt><dd>${esc(e.dist)}</dd></dl>
+    <div class="acts"><a class="btn pri" href="${esc(e.url)}" target="_blank" rel="noopener">Сайт организатора ↗</a>
+    <button class="btn" type="button" data-star="${e.id}" aria-pressed="${stars.has(e.id)}">${stars.has(e.id)?'★ В плане':'☆ В мой план'}</button>
+    <button class="btn" type="button" id="mclose">Закрыть</button></div></div>`;
+  ovl.hidden=false;document.getElementById('mclose').focus();
+}
+ovl.onclick=ev=>{if(ev.target===ovl||ev.target.id==='mclose'){ovl.hidden=true;}};
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape')ovl.hidden=true;});
+
+document.addEventListener('click',ev=>{
+  const s=ev.target.closest('[data-star]');
+  if(s){const id=s.dataset.star;stars.has(id)?stars.delete(id):stars.add(id);saveStars();if(!ovl.hidden)openModal(id);render();return;}
+  const nm=ev.target.closest('.nm[data-id]');if(nm)openModal(nm.dataset.id);
+});
+
+/* ---------- tabs ---------- */
+const tc=document.getElementById('tab-cal'),tl=document.getElementById('tab-list');
+tc.onclick=()=>{st.view='cal';render();};tl.onclick=()=>{st.view='list';render();};
+
+/* ---------- render ---------- */
+function render(){
+  drawFilters();
+  const list=filtered();
+  const inRange=EV.filter(e=>e.b>=RANGE_A&&e.a<=RANGE_B);
+  document.getElementById('stats').innerHTML=
+    `<div class="stat"><b>${list.length}</b><span>${list.length===inRange.length?'стартов':'из '+inRange.length+' стартов'}</span></div>`+
+    `<div class="stat"><b>${new Set(list.map(e=>e.country)).size}</b><span>стран</span></div>`+
+    `<div class="stat"><b>${stars.size}</b><span>в плане</span></div>`;
+  const active=st.sport.size+st.dist.size+st.region.size+st.series.size+(st.country?1:0)+(st.conf?1:0)+(st.star?1:0)+(st.q?1:0);
+  document.getElementById('fcount').textContent=active?('активно: '+active):'';
+  drawStrip(list);drawPlan();
+  tc.setAttribute('aria-selected',st.view==='cal');tl.setAttribute('aria-selected',st.view==='list');
+  document.getElementById('view-cal').hidden=st.view!=='cal';document.getElementById('view-list').hidden=st.view!=='list';
+  document.getElementById('calnav').style.visibility=st.view==='cal'?'visible':'hidden';
+  if(st.view==='cal')drawCal(list);else drawList(list);
+}
+render();
+})();
+</script>
+
+</body>
+</html>
